@@ -1,6 +1,7 @@
 <?php
 
 
+use Cz\Git\GitException;
 use Cz\Git\GitRepository;
 
 /**
@@ -16,25 +17,15 @@ class ExtendedGitRepository extends GitRepository
 	 *
 	 * TODO: If [pull request #48 on czproject/git-php](https://github.com/czproject/git-php/pull/48) gets merged, remove this method and use the method provided by the pull request.
 	 *
-	 * @param string|File $filename
+	 * @param string $filename
 	 * @return bool
 	 * @throws GitException
-	 * @throws InvalidConfigurationException
 	 */
-	private function isFileInGit($filename)
+	public function isFileInGit($filename)
 	{
-		if ($filename instanceof File)
-		{
-			$filename = $filename->Filename;
-		}
-		elseif (!is_string($filename))
-		{
-			throw new InvalidArgumentException(__METHOD__ . ': $filename should be either a string path to a file, or a File object whose Filename property should be used as a file path. This was passed instead: ' . print_r($filename, true));
-		}
-
 		try
 		{
-			$this->repository()->execute(['ls-files', '--error-unmatch', $filename]);
+			$this->execute(['ls-files', '--error-unmatch', $filename]);
 		}
 		catch (GitException $git_exception)
 		{

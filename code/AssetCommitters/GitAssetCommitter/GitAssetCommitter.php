@@ -2,7 +2,6 @@
 
 
 use Cz\Git\GitException;
-use Cz\Git\GitRepository;
 
 class GitAssetCommitter extends AssetCommitter implements AssetCommitterInterface
 {
@@ -89,7 +88,7 @@ class GitAssetCommitter extends AssetCommitter implements AssetCommitterInterfac
 	public function CommitFileDeletion(File $file)
 	{
 		if (!static::config()->commit_file_deletions) return;
-		if (!$this->isFileInGit($file)) return; // If the file does not exist in the repository, it can't be removed from there, so nothing to do.
+		if (!$this->repository()->isFileInGit($file->Filename)) return; // If the file does not exist in the repository, it can't be removed from there, so nothing to do.
 		$this->reset_git_stage();
 
 		$this->repository()->removeFile($this->getAbsoluteFilename($file)); // The file is actually already deleted from the disk before calling this.
@@ -115,7 +114,7 @@ class GitAssetCommitter extends AssetCommitter implements AssetCommitterInterfac
 		$absolute_old_name = Director::getAbsFile($old_name);
 		$absolute_new_name = Director::getAbsFile($new_name);
 
-		if ($this->isFileInGit($absolute_old_name))
+		if ($this->repository()->isFileInGit($absolute_old_name))
 		{
 			// Normal case, rename the file in git.
 			// Do not use $this->repository()->renameFile() because it would call `git mv` which doesn't like that the source file is already renamed to the target.
