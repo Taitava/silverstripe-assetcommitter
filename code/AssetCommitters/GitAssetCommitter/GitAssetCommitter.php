@@ -134,12 +134,12 @@ class GitAssetCommitter extends AssetCommitter implements AssetCommitterInterfac
 	}
 
 	/**
-	 * @var GitRepository
+	 * @var ExtendedGitRepository
 	 */
 	private $repository;
 
 	/**
-	 * @return GitRepository|mixed
+	 * @return ExtendedGitRepository|mixed
 	 * @throws InvalidConfigurationException
 	 */
 	private function repository()
