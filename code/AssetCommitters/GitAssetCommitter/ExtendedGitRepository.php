@@ -13,6 +13,55 @@ use Cz\Git\GitRepository;
 class ExtendedGitRepository extends GitRepository
 {
 	/**
+	 * @param string|string[]
+	 * @return string[]  returns output
+	 * @throws GitException
+	 */
+	public function execute($cmd)
+	{
+		if (!is_array($cmd))
+		{
+			$cmd = array($cmd);
+		}
+
+		array_unshift($cmd, 'git');
+		$cmd = self::processCommand($cmd);
+
+		$this->begin();
+		exec($cmd . ' 2>&1', $output, $ret);
+		$this->end();
+
+		if ($ret !== 0)
+		{
+			// user_error('git error: '.implode(PHP_EOL, $output)); // TODO: POISTA!
+			throw new GitException("Command '$cmd' failed (exit-code $ret).", $ret);
+		}
+
+		return $output;
+	}
+
+	/**
+	 * Runs command.
+	 *
+	 * @param string|array
+	 * @return self
+	 * @throws GitException
+	 */
+	protected function run($cmd/*, $options = NULL*/)
+	{
+		$args = func_get_args();
+		$cmd = self::processCommand($args);
+		exec($cmd . ' 2>&1', $output, $ret);
+
+		if ($ret !== 0)
+		{
+			throw new GitException("Command '$cmd' failed (exit-code $ret).", $ret);
+		}
+
+		return $this;
+	}
+
+	/**
 	 * Checks whether the given file is committed to the git repository or not.
 	 *
 	 * TODO: If [pull request #48 on czproject/git-php](https://github.com/czproject/git-php/pull/48) gets merged, remove this method and use the method provided by the pull request.
