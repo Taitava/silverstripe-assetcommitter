@@ -88,10 +88,11 @@ class GitAssetCommitter extends AssetCommitter implements AssetCommitterInterfac
 	public function CommitFileDeletion(File $file)
 	{
 		if (!static::config()->commit_file_deletions) return;
-		if (!$this->repository()->isFileInGit($file->Filename)) return; // If the file does not exist in the repository, it can't be removed from there, so nothing to do.
+		$absolute_filename = $this->getAbsoluteFilename($file);
+		if (!$this->repository()->isFileInGit($absolute_filename)) return; // If the file does not exist in the repository, it can't be removed from there, so nothing to do.
 		$this->reset_git_stage();
 
-		$this->repository()->removeFile($this->getAbsoluteFilename($file)); // The file is actually already deleted from the disk before calling this.
+		$this->repository()->removeFile($absolute_filename); // The file is actually already deleted from the disk before calling this.
 		$commit_message = _t('GitAssetCommitter.CommitMessage.FileDeletion', 'Deleted file {filename}.', '', ['filename' => $file->Filename]);
 		$this->commit($commit_message);
 	}
