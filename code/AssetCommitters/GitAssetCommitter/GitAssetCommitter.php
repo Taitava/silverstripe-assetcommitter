@@ -146,7 +146,7 @@ class GitAssetCommitter extends AssetCommitter implements AssetCommitterInterfac
 	{
 		if (!$this->repository)
 		{
-			$this->repository = Injector::inst()->createWithArgs(GitRepository::class, [
+			$this->repository = Injector::inst()->createWithArgs(ExtendedGitRepository::class, [
 				$this->repository_path(),
 			]);
 		}
