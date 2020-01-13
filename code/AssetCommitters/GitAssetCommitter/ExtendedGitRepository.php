@@ -13,6 +13,8 @@ use Cz\Git\GitRepository;
 class ExtendedGitRepository extends GitRepository
 {
 	/**
+	 * TODO: Remove this overrider if [czproject/git-php pull request #50](https://github.com/czproject/git-php/pull/50) gets merged.
+	 *
 	 * @param string|string[]
 	 * @return string[]  returns output
 	 * @throws GitException
@@ -33,15 +35,14 @@ class ExtendedGitRepository extends GitRepository
 
 		if ($ret !== 0)
 		{
-			// user_error('git error: '.implode(PHP_EOL, $output)); // TODO: POISTA!
-			throw new GitException("Command '$cmd' failed (exit-code $ret).", $ret);
+			throw new ExtendedGitException("Command '$cmd' failed (exit-code $ret).", $ret, NULL, $output); // ONLY THIS LINE IS MODIFIED
 		}
 
 		return $output;
 	}
 
 	/**
-	 * Runs command.
+	 * TODO: Remove this overrider if [czproject/git-php pull request #50](https://github.com/czproject/git-php/pull/50) gets merged.
 	 *
 	 * @param string|array
 	 * @return self
@@ -55,7 +56,7 @@ class ExtendedGitRepository extends GitRepository
 
 		if ($ret !== 0)
 		{
-			throw new GitException("Command '$cmd' failed (exit-code $ret).", $ret);
+			throw new ExtendedGitException("Command '$cmd' failed (exit-code $ret).", $ret, NULL, $output); // ONLY THIS LINE IS MODIFIED
 		}
 
 		return $this;

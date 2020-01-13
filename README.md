@@ -68,6 +68,9 @@ You simply might be missing write permissions to the .git directory of your repo
 
 But this is not always the reason for this error message. Unfortunately czproject/git-php does not report original error messages yelled by git (at least that's the case for czproject/git-php version 3.17.1). For further reference, please see [czproject/git-php issue #47](https://github.com/czproject/git-php/issues/47)
 
+I've customised the library (by subclassing `GitRepository` class and `GitException` exception) to add more information to `GitException`. You should be able to see a "Command output:" part in the exception's `message`, which contains descriptive error messages from git commands.
+
+I've also made [a pull request to bring my improvisations to the original library](https://github.com/czproject/git-php/pull/50). If it gets merged, I will remove my customisations from this module.
 
 ## TODO & BUGS
 ### For a 1.0 release:
