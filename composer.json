@@ -1,0 +1,20 @@
+{
+  "name": "taitava/silverstripe-assetcommitter",
+  "description": "Commit your uploaded SilverStripe asset files immediately to a VCS repository.",
+  "type": "silverstripe-module",
+  "license": "MIT",
+  "require": {
+    "silverstripe/framework": "^3.2",
+	"czproject/git-php": "^3.17.1"
+  },
+  "keywords": ["silverstripe","git","commit","push","repository","asset","assets","file","files"],
+  "authors": [{
+    "name": "Jarkko Linnanvirta",
+    "email": "jarkko@taitavasti.fi",
+    "homepage": "http://taitavasti.fi",
+    "role": "Developer"
+  }],
+  "extra": {
+    "installer-name": "assetcommitter"
+  }
+}

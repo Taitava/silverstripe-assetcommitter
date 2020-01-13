@@ -1,0 +1,6 @@
+---
+name: assetcommitter
+---
+File:
+  extensions:
+    - AssetCommitterFileExtension
