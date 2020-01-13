@@ -71,12 +71,12 @@ But this is not always the reason for this error message. Unfortunately czprojec
 
 ## TODO & BUGS
 ### For a 1.0 release:
-- Fix an issue with renamed/moved _folders_.
-- Handle file overwriting. I'm not sure how it goes right now, will it first perform a deletion commit and then a creation commit?
-- Do not try to commit ignored files.
+- Fix an issue with renamed/moved _folders_. See #1.
+- Handle file overwriting. I'm not sure how it goes right now, will it first perform a deletion commit and then a creation commit? See #2.
+- Do not try to commit ignored files. See #3.
 
 ### Can be done later:
-- Make it possible to use a subfolder of `assets as the repository root directory. This way not all of the assets would have to be brought into version control. The issue preventing this currently is the fact that the module always tries to commit all asset files without checking if they reside in the repository directory or not.
+- Make it possible to use a subfolder of `assets` as the repository root directory. See #4.
 - Create a `BuildTask` that could be ran to init a git repository. This would also setup a default author for the repository.
 - Create a `BuildTask` that could be ran to check that the git repository can be properly accessed (exists and is writable).
 
