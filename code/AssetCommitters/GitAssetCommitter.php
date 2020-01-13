@@ -250,6 +250,8 @@ class GitAssetCommitter extends AssetCommitter implements AssetCommitterInterfac
 	/**
 	 * Checks whether the given file is committed to the git repository or not.
 	 *
+	 * TODO: If [pull request #48 on czproject/git-php](https://github.com/czproject/git-php/pull/48) gets merged, remove this method and use the method provided by the pull request.
+	 *
 	 * @param string|File $filename
 	 * @return bool
 	 * @throws GitException
