@@ -75,7 +75,7 @@ class GitAssetCommitter extends AssetCommitter implements AssetCommitterInterfac
 		$this->reset_git_stage();
 
 		$this->repository()->addFile($this->getAbsoluteFilename($file));
-		$commit_message = _t('GitAssetCommitter.CommitMessage.FileCreation', 'Created file {filename}.', '', ['filename' => $file->Filename]);
+		$commit_message = _t('GitAssetCommitter.CommitMessage.FileCreation', 'Create file {filename}.', '', ['filename' => $file->Filename]);
 		$this->commit($commit_message);
 	}
 
@@ -93,7 +93,7 @@ class GitAssetCommitter extends AssetCommitter implements AssetCommitterInterfac
 		$this->reset_git_stage();
 
 		$this->repository()->removeFile($absolute_filename); // The file is actually already deleted from the disk before calling this.
-		$commit_message = _t('GitAssetCommitter.CommitMessage.FileDeletion', 'Deleted file {filename}.', '', ['filename' => $file->Filename]);
+		$commit_message = _t('GitAssetCommitter.CommitMessage.FileDeletion', 'Delete file {filename}.', '', ['filename' => $file->Filename]);
 		$this->commit($commit_message);
 	}
 
@@ -122,13 +122,13 @@ class GitAssetCommitter extends AssetCommitter implements AssetCommitterInterfac
 			// We can safely call `git rm` and `git add` - git will figure out that this is still just about one file being given another name.
 			$this->repository()->removeFile($absolute_old_name);
 			$this->repository()->addFile($absolute_new_name);
-			$commit_message = _t('GitAssetCommitter.CommitMessage.FileRenaming', 'Renamed file {old_filename} to {new_filename}.', '', ['old_filename' => $old_name, 'new_filename' => $new_name]);
+			$commit_message = _t('GitAssetCommitter.CommitMessage.FileRenaming', 'Rename file {old_filename} to {new_filename}.', '', ['old_filename' => $old_name, 'new_filename' => $new_name]);
 		}
 		else
 		{
 			// The old file didn't exist in git. Create it!
 			$this->repository()->addFile($absolute_new_name);
-			$commit_message = _t('GitAssetCommitter.CommitMessage.FileRenaming_didntexistbefore', 'Renamed file {old_filename} to {new_filename}. Note that this file was not previously committed in the repository, so it appears as a new file in this commit although it\'s been around for a while.', '', ['old_filename' => $old_name, 'new_filename' => $new_name]);
+			$commit_message = _t('GitAssetCommitter.CommitMessage.FileRenaming_didntexistbefore', 'Rename file {old_filename} to {new_filename}. Note that this file was not previously committed in the repository, so it appears as a new file in this commit although it\'s been around for a while.', '', ['old_filename' => $old_name, 'new_filename' => $new_name]); // TODO: Replace 'didntexistbefore' keyword with something better.
 		}
 		$this->commit($commit_message);
 	}
