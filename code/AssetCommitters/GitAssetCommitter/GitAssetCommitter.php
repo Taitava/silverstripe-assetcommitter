@@ -242,23 +242,35 @@ class GitAssetCommitter extends AssetCommitter implements AssetCommitterInterfac
 			$commit_parameters['--author'] = $author;
 		}
 		$this->repository()->commit($commit_message, $commit_parameters);
+		$this->newCommitCreated();
+	}
 
-		// Push
-		if ($push_to = static::config()->push_to_after_committing)
+	/**
+	 * {@inheritDoc}
+	 *
+	 * @throws GitException
+	 * @throws InvalidConfigurationException
+	 */
+	public function PushToRemoteRepository()
+	{
+		$push_to = static::config()->push_to_after_committing;
+		if (preg_match('/ /', $push_to))
 		{
-			if (preg_match('/ /', $push_to))
-			{
-				// Both remote and branch are defined (separated by a space)
-				[$remote, $branch] = explode(' ', $push_to);
-			}
-			else
-			{
-				// Only the remote is defined
-				$remote = $push_to;
-				$branch = null;
-			}
-			$this->repository()->push($remote, [$branch]);
+			// Both remote and branch are defined (separated by a space)
+			[$remote, $branch] = explode(' ', $push_to);
 		}
+		else
+		{
+			// Only the remote is defined
+			$remote = $push_to;
+			$branch = null;
+		}
+		$this->repository()->push($remote, [$branch]);
+	}
+
+	public function isPushingEnabled()
+	{
+		return (bool) static::config()->push_to_after_committing;
 	}
 
 	/**
