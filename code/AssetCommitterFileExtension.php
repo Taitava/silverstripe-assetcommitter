@@ -3,12 +3,14 @@
 /**
  * Class AssetCommitterFileExtension
  *
- * @property $owner static|File
+ * @property AssetCommitterFileExtension|File $owner
  */
 class AssetCommitterFileExtension extends Extension
 {
 	/**
 	 * Commits a new file.
+	 *
+	 * @throws AssetCommitterFactoryException
 	 */
 	public function onAfterUpload()
 	{
@@ -20,6 +22,8 @@ class AssetCommitterFileExtension extends Extension
 
 	/**
 	 * Commits a file deletion.
+	 *
+	 * @throws AssetCommitterFactoryException
 	 */
 	public function onAfterDelete()
 	{
@@ -31,6 +35,8 @@ class AssetCommitterFileExtension extends Extension
 
 	/**
 	 * Commits a renamed/moved file.
+	 *
+	 * @throws AssetCommitterFactoryException
 	 */
 	public function updateLinks($old_name, $new_name)
 	{
