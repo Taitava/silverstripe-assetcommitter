@@ -112,8 +112,6 @@ class GitAssetCommitter extends AssetCommitter implements AssetCommitterInterfac
 		if (!static::config()->commit_file_renamings) return;
 		$this->reset_git_stage();
 
-		// FIXME: This method does not work when handling a file that resides in a folder that has been renamed/moved. To put it in other words: the file itself has not been renamed or moved, but the container folder has been renamed/moved. In this case, git will yell "no changes added to commit". But our own check in self::commit() does indicate that there _is_ staged changes, so it proceeds with committing, but then git will say that there's nothing to commit.
-
 		$absolute_old_name = Director::getAbsFile($old_name);
 		$absolute_new_name = Director::getAbsFile($new_name);
 		$old_name_ignored = $this->repository()->isFileIgnored($absolute_old_name, true);
