@@ -59,7 +59,7 @@ class AssetCommitterFileExtension extends Extension
 	{
 		if (!$this->committer)
 		{
-			$factory = new AssetCommitterFactory;
+			$factory = singleton(AssetCommitterFactory::class);
 			$this->committer = $factory->CreateCommitter();
 		}
 		return $this->committer;
