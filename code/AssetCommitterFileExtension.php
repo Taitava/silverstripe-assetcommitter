@@ -57,7 +57,7 @@ class AssetCommitterFileExtension extends Extension
 	 */
 	private function committer()
 	{
-		return AssetCommitterFactory::CreateCommitter();
+		return AssetCommitterFactory::getCommitter();
 	}
 
 	/**
