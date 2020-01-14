@@ -72,6 +72,20 @@ I've customised the library (by subclassing `GitRepository` class and `GitExcept
 
 I've also made [a pull request to bring my improvisations to the original library](https://github.com/czproject/git-php/pull/50). If it gets merged, I will remove my customisations from this module.
 
+### How to provide username and password for commands
+
+    This section is copied on 2020-01-14 from [czproject/git-php README.md](https://github.com/czproject/git-php/blob/b5e709f0e9c4e4e39b49d4e322f7fa73c1bb21dc/readme.md).
+    
+    > 1. use SSH instead of HTTPS - https://stackoverflow.com/a/8588786
+    > 2. store credentials to Git Credential Storage
+    >    http://www.tilcode.com/push-github-without-entering-username-password-windows-git-bash/
+    >    https://help.github.com/articles/caching-your-github-password-in-git/
+    >    https://git-scm.com/book/en/v2/Git-Tools-Credential-Storage
+    > 3. insert user and password into remote URL - https://stackoverflow.com/a/16381160
+    >    git remote add origin https://user:password@server/path/repo.git
+    > 4. NOT IMPLEMENTED IN THIS MODULE: for push() you can use --repo argument - https://stackoverflow.com/a/12193555
+    >    $git->push(NULL, array('--repo' => 'https://user:password@server/path/repo.git'));
+    
 ## TODO & BUGS
 ### For a 1.0 release:
 - Handle file overwriting. I'm not sure how it goes right now, will it first perform a deletion commit and then a creation commit? See [issue #2](https://github.com/Taitava/silverstripe-assetcommitter/issues/2).
