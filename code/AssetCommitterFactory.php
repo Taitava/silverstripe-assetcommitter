@@ -14,7 +14,7 @@ class AssetCommitterFactory extends SS_Object
 	 * @return AssetCommitterInterface
 	 * @throws AssetCommitterFactoryException
 	 */
-	public function CreateCommitter()
+	public static function CreateCommitter()
 	{
 		$committer_class = static::config()->committer_class;
 		if (!ClassInfo::classImplements($committer_class, AssetCommitterInterface::class))

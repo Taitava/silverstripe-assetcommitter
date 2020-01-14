@@ -52,17 +52,12 @@ class AssetCommitterFileExtension extends Extension
 	}
 
 	/**
-	 * @var AssetCommitterInterface
+	 * @return AssetCommitterInterface
+	 * @throws AssetCommitterFactoryException
 	 */
-	private $committer;
 	private function committer()
 	{
-		if (!$this->committer)
-		{
-			$factory = singleton(AssetCommitterFactory::class);
-			$this->committer = $factory->CreateCommitter();
-		}
-		return $this->committer;
+		return AssetCommitterFactory::CreateCommitter();
 	}
 
 	/**
