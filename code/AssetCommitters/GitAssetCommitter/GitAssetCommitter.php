@@ -257,7 +257,7 @@ class GitAssetCommitter extends AssetCommitter implements AssetCommitterInterfac
 				$remote = $push_to;
 				$branch = null;
 			}
-			$this->repository()->push($remote, $branch);
+			$this->repository()->push($remote, [$branch]);
 		}
 	}
 
