@@ -285,12 +285,20 @@ class GitAssetCommitter extends AssetCommitter implements AssetCommitterInterfac
 		// Allow extensions to alter the commit message
 		$this->extend('updateGitCommitMessage', $action, $commit_message);
 
+		// Define a commit author
 		$commit_parameters = [];
-		if (static::automatically_define_author() && $author = $this->getCommitAuthor())
+		$author = null;
+		if (static::automatically_define_author())
 		{
-			// We can only have an author name if someone is logged in in the CMS
+			$author = $this->getCommitAuthor(); // We can only have an author name if someone is logged in in the CMS
+		}
+		$this->extend('updateGitCommitAuthor', $action, $author);
+		if ($author)
+		{
 			$commit_parameters['--author'] = $author;
 		}
+
+		// Commit
 		$this->repository()->commit($commit_message, $commit_parameters);
 		$this->newCommitCreated();
 	}
