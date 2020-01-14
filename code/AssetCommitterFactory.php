@@ -16,23 +16,26 @@ class AssetCommitterFactory extends SS_Object
 	 */
 	public static function getCommitter()
 	{
-		$committer_class = static::config()->committer_class;
-		if (!ClassInfo::classImplements($committer_class, AssetCommitterInterface::class))
-		{
-			$error = __METHOD__ . ': YAML configuration value for "' . static::class . '.committer_class" should be a class name that implements the ' . AssetCommitterInterface::class . ' interface.';
-			if (class_exists($committer_class))
-			{
-				$error .= ' The class name "' . $committer_class . '" exists but is either a wrong class, or maybe the class is missing an "implements" clause.';
-			}
-			else
-			{
-				$error .= ' The class name "' . $committer_class . '" does not exist.';
-			}
-			throw new AssetCommitterFactoryException($error);
-		}
-
 		/** @var AssetCommitterInterface $committer */
-		$committer = singleton($committer_class);
+		static $committer;
+		if (!$committer)
+		{
+			$committer_class = static::config()->committer_class;
+			if (!ClassInfo::classImplements($committer_class, AssetCommitterInterface::class))
+			{
+				$error = __METHOD__ . ': YAML configuration value for "' . static::class . '.committer_class" should be a class name that implements the ' . AssetCommitterInterface::class . ' interface.';
+				if (class_exists($committer_class))
+				{
+					$error .= ' The class name "' . $committer_class . '" exists but is either a wrong class, or maybe the class is missing an "implements" clause.';
+				}
+				else
+				{
+					$error .= ' The class name "' . $committer_class . '" does not exist.';
+				}
+				throw new AssetCommitterFactoryException($error);
+			}
+			$committer = singleton($committer_class);
+		}
 		return $committer;
 	}
 }
