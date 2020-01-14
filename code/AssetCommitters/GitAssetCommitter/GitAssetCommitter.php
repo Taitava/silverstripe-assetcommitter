@@ -119,7 +119,17 @@ class GitAssetCommitter extends AssetCommitter implements AssetCommitterInterfac
 		$is_old_name_in_git = $this->repository()->isFileInGit($absolute_old_name);
 		if (!$is_old_name_in_git && $new_name_ignored) return; // Old filename is not committed in the past, and new filename is ignored, so cancel because there would not be any deletion or addition to commit.
 
-		$base_commit_message = _t('GitAssetCommitter.CommitMessage.FileRenaming', 'Rename file {old_filename} to {new_filename}.', '', ['old_filename' => $old_name, 'new_filename' => $new_name]);
+		// Are we moving or just renaming?
+		if (dirname($absolute_old_name) === dirname($absolute_new_name))
+		{
+			$verb = _t('GitAssetCommitter.CommitMessage.FileRenaming_Verb_Rename', 'Rename');
+		}
+		else
+		{
+			$verb = _t('GitAssetCommitter.CommitMessage.FileRenaming_Verb_Move', 'Move');
+		}
+
+		$base_commit_message = _t('GitAssetCommitter.CommitMessage.FileRenaming', "{verb} file {old_filename} to {new_filename}.", '', ['verb' => $verb, 'old_filename' => $old_name, 'new_filename' => $new_name]);
 		$extra_commit_message = '';
 		$operations = [
 			'delete_old' => false,
