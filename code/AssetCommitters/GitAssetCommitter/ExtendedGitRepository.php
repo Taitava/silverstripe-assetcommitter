@@ -128,4 +128,36 @@ class ExtendedGitRepository extends GitRepository
 		return true;
 	}
 
+	/**
+	 * Checks whether the given file is modified.
+	 *
+	 * @param string $filename
+	 * @return bool
+	 * @throws GitException
+	 */
+	public function isFileModified($filename)
+	{
+		try
+		{
+			$this->execute(['ls-files', '-m', '--error-unmatch', $filename]);
+		}
+		catch (GitException $git_exception)
+		{
+			switch ($git_exception->getCode())
+			{
+			case 1:
+				// The `git ls-files -m --error-unmatch` command didn't find the given file among modified files and has
+				// yelled an error number 1. This exception can be considered normal. We can just report that the file is
+				// not modified and continue the execution normally.
+				return false;
+			break;
+			default:
+				// An unrecognised error has occurred. Rethrow the exception.
+				throw $git_exception;
+			}
+		}
+		// As the command didn't give any error code when exiting, it's a sign for us to know that the file is modified.
+		return true;
+	}
+
 }

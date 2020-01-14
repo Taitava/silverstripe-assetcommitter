@@ -17,7 +17,21 @@ class AssetCommitterFileExtension extends Extension
 		if ($this->isFolder()) return; // Folder management is not supported at the moment.
 		if ($this->isRepetitiveCall(__METHOD__)) return; // A dirty bug fix
 
-		$this->committer()->CommitFileCreation($this->owner);
+		// We do not know whether the uploaded file is a completely new file or if it has replaced an older file. As SilverStripe
+		// does not pass us that information, we need to take an enlightened guess by checking when the file db record was
+		// first created.
+		// TODO: See if SilverStripe 4 provides an indication whether the file was overridden.
+		$created = strtotime($this->owner->Created);
+		if ((time() - $created) > 10) // This is not a nice way to do this :(
+		{
+			// The creation time is older than ten seconds, so we are probably overwriting an existing file
+			$this->committer()->CommitFileReplacement($this->owner);
+		}
+		else
+		{
+			// We are probably creating a new file
+			$this->committer()->CommitFileCreation($this->owner);
+		}
 	}
 
 	/**

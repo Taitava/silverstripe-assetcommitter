@@ -56,6 +56,11 @@ class GitAssetCommitter extends AssetCommitter implements AssetCommitterInterfac
 	/**
 	 * @conf bool
 	 */
+	private static $commit_file_replacements = true;
+
+	/**
+	 * @conf bool
+	 */
 	private static $commit_file_deletions = true;
 
 	/**
@@ -79,6 +84,47 @@ class GitAssetCommitter extends AssetCommitter implements AssetCommitterInterfac
 		$this->repository()->addFile($absolute_filename);
 		$commit_message = _t('GitAssetCommitter.CommitMessage.FileCreation', 'Create file {filename}.', '', ['filename' => $file->Filename]);
 		$this->commit($commit_message);
+	}
+
+	/**
+	 * @param File $file
+	 * @throws GitException
+	 * @throws InvalidConfigurationException
+	 * @throws GitAssetCommitterException
+	 */
+	public function CommitFileReplacement(File $file)
+	{
+		if (!static::config()->commit_file_replacements) return;
+		$absolute_filename = $this->getAbsoluteFilename($file);
+		if ($this->repository()->isFileIgnored($absolute_filename)) return; // Do not try to commit ignored files
+		$this->reset_git_stage();
+
+		$base_commit_message = _t('GitAssetCommitter.CommitMessage.FileReplacement', 'Overwrite file {filename}.', '', ['filename' => $file->Filename]);
+		$extra_commit_message = '';
+
+		// We need to inspect how the file has changed on the disk
+		if ($this->repository()->isFileInGit($absolute_filename))
+		{
+			// The old version of the file is in git. Check if the file has _really_ changed.
+			if ($this->repository()->isFileModified($absolute_filename))
+			{
+				// The file content has changed
+				$this->repository()->addFile($absolute_filename);
+			}
+			else
+			{
+				// Sometimes an overriding file is actually just the same file we already had before. This seems to be the
+				// case now. We have nothing to commit now.
+				return;
+			}
+		}
+		else
+		{
+			// The old version of the file was not in git for some reason. Now the new version will be.
+			$extra_commit_message = _t('GitAssetCommitter.CommitMessage.FileReplacement_','The old version of this file was never committed, so this overriding file will appear as a completely new file in this commit.');
+			$this->repository()->addFile($absolute_filename);
+		}
+		$this->commit(implode(PHP_EOL, [$base_commit_message, $extra_commit_message]));
 	}
 
 	/**
