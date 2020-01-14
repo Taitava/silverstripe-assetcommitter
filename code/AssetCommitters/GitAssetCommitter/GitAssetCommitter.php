@@ -83,7 +83,7 @@ class GitAssetCommitter extends AssetCommitter implements AssetCommitterInterfac
 
 		$this->repository()->addFile($absolute_filename);
 		$commit_message = _t('GitAssetCommitter.CommitMessage.FileCreation', 'Create file {filename}.', '', ['filename' => $file->Filename]);
-		$this->commit($commit_message);
+		$this->commit('create', $commit_message);
 	}
 
 	/**
@@ -124,7 +124,7 @@ class GitAssetCommitter extends AssetCommitter implements AssetCommitterInterfac
 			$extra_commit_message = _t('GitAssetCommitter.CommitMessage.FileReplacement_','The old version of this file was never committed, so this overriding file will appear as a completely new file in this commit.');
 			$this->repository()->addFile($absolute_filename);
 		}
-		$this->commit(implode(PHP_EOL, [$base_commit_message, $extra_commit_message]));
+		$this->commit('replace', implode(PHP_EOL, [$base_commit_message, $extra_commit_message]));
 	}
 
 	/**
@@ -142,7 +142,7 @@ class GitAssetCommitter extends AssetCommitter implements AssetCommitterInterfac
 
 		$this->repository()->removeFile($absolute_filename); // The file is actually already deleted from the disk before calling this.
 		$commit_message = _t('GitAssetCommitter.CommitMessage.FileDeletion', 'Delete file {filename}.', '', ['filename' => $file->Filename]);
-		$this->commit($commit_message);
+		$this->commit('delete', $commit_message);
 	}
 
 	/**
@@ -220,7 +220,7 @@ class GitAssetCommitter extends AssetCommitter implements AssetCommitterInterfac
 		if ($operations['create_new']) $this->repository()->addFile($absolute_new_name);
 		$commit_message = $base_commit_message;
 		if ($extra_commit_message) $commit_message .= PHP_EOL . $extra_commit_message;
-		$this->commit($commit_message);
+		$this->commit('rename', $commit_message);
 	}
 
 	/**
@@ -268,18 +268,22 @@ class GitAssetCommitter extends AssetCommitter implements AssetCommitterInterfac
 	}
 
 	/**
+	 * @param string $action Either 'create', 'replace', 'rename', or 'delete'. This is just to tell possible hook methods what we are currently doing.
 	 * @param string $commit_message
+	 * @throws GitAssetCommitterException
 	 * @throws GitException
 	 * @throws InvalidConfigurationException
-	 * @throws GitAssetCommitterException
 	 */
-	private function commit($commit_message)
+	private function commit($action, $commit_message)
 	{
 		if (!$this->repository()->hasChanges())
 		{
 			// Nothing to commit
 			throw new GitAssetCommitterException(__METHOD__.': No changes are staged to be committed.');
 		}
+
+		// Allow extensions to alter the commit message
+		$this->extend('updateGitCommitMessage', $action, $commit_message);
 
 		$commit_parameters = [];
 		if (static::automatically_define_author() && $author = $this->getCommitAuthor())
