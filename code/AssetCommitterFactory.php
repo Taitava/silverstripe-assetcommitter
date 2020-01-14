@@ -30,7 +30,10 @@ class AssetCommitterFactory extends SS_Object
 			}
 			throw new AssetCommitterFactoryException($error);
 		}
-		return Injector::inst()->create($committer_class);
+
+		/** @var AssetCommitterInterface $committer */
+		$committer = singleton($committer_class);
+		return $committer;
 	}
 }
 
