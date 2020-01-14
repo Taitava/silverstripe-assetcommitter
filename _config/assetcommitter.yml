@@ -4,3 +4,6 @@ name: assetcommitter
 File:
   extensions:
     - AssetCommitterFileExtension
+RequestHandler:
+  extensions:
+    - AssetCommitterRequestHandlerExtension
