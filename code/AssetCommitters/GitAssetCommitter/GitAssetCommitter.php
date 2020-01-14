@@ -72,9 +72,11 @@ class GitAssetCommitter extends AssetCommitter implements AssetCommitterInterfac
 	public function CommitFileCreation(File $file)
 	{
 		if (!static::config()->commit_file_creations) return;
+		$absolute_filename = $this->getAbsoluteFilename($file);
+		if ($this->repository()->isFileIgnored($absolute_filename)) return; // Do not try to commit ignored files
 		$this->reset_git_stage();
 
-		$this->repository()->addFile($this->getAbsoluteFilename($file));
+		$this->repository()->addFile($absolute_filename);
 		$commit_message = _t('GitAssetCommitter.CommitMessage.FileCreation', 'Create file {filename}.', '', ['filename' => $file->Filename]);
 		$this->commit($commit_message);
 	}
@@ -114,22 +116,56 @@ class GitAssetCommitter extends AssetCommitter implements AssetCommitterInterfac
 
 		$absolute_old_name = Director::getAbsFile($old_name);
 		$absolute_new_name = Director::getAbsFile($new_name);
+		$old_name_ignored = $this->repository()->isFileIgnored($absolute_old_name, true);
+		$new_name_ignored = $this->repository()->isFileIgnored($absolute_new_name, true);
+		$is_old_name_in_git = $this->repository()->isFileInGit($absolute_old_name);
+		if (!$is_old_name_in_git && $new_name_ignored) return; // Old filename is not committed in the past, and new filename is ignored, so cancel because there would not be any deletion or addition to commit.
 
-		if ($this->repository()->isFileInGit($absolute_old_name))
+		$base_commit_message = _t('GitAssetCommitter.CommitMessage.FileRenaming', 'Rename file {old_filename} to {new_filename}.', '', ['old_filename' => $old_name, 'new_filename' => $new_name]);
+		$extra_commit_message = '';
+		$operations = [
+			'delete_old' => false,
+			'create_new' => false,
+		];
+
+		// Check if the old file actually is in the repository
+		if ($is_old_name_in_git)
 		{
 			// Normal case, rename the file in git.
-			// Do not use $this->repository()->renameFile() because it would call `git mv` which doesn't like that the source file is already renamed to the target.
-			// We can safely call `git rm` and `git add` - git will figure out that this is still just about one file being given another name.
-			$this->repository()->removeFile($absolute_old_name);
-			$this->repository()->addFile($absolute_new_name);
-			$commit_message = _t('GitAssetCommitter.CommitMessage.FileRenaming', 'Rename file {old_filename} to {new_filename}.', '', ['old_filename' => $old_name, 'new_filename' => $new_name]);
+			// No need to check whether the old name is ignored. We know it's not because the file is already committed in the past
+			if ($new_name_ignored)
+			{
+				// The file will become ignored after the renaming, so commit this operation as a deletion only
+				$operations['delete_old'] = true;
+				$extra_commit_message = _t('GitAssetCommitter.CommitMessage.FileRenaming_NewNameIgnored', 'The new filename is excluded by a .gitignore file, so only a deletion is committed.');
+			}
+			else
+			{
+				// Do not use $this->repository()->renameFile() because it would call `git mv` which doesn't like that the source file is already renamed to the target.
+				// We can safely call `git rm` and `git add` - git will figure out that this is still just about one file being given another name.
+				$operations['delete_old'] = true;
+				$operations['create_new'] = true;
+			}
 		}
 		else
 		{
 			// The old file didn't exist in git. Create it!
-			$this->repository()->addFile($absolute_new_name);
-			$commit_message = _t('GitAssetCommitter.CommitMessage.FileRenaming_didntexistbefore', 'Rename file {old_filename} to {new_filename}. Note that this file was not previously committed in the repository, so it appears as a new file in this commit although it\'s been around for a while.', '', ['old_filename' => $old_name, 'new_filename' => $new_name]); // TODO: Replace 'didntexistbefore' keyword with something better.
+			$operations['create_new'] = true;
+			if ($old_name_ignored)
+			{
+				$extra_commit_message = _t('GitAssetCommitter.CommitMessage.FileRenaming_OldNameIgnored', 'The previous filename was excluded by a .gitignore file, so it appears as a new file in this commit.');
+			}
+			else
+			{
+				$extra_commit_message = _t('GitAssetCommitter.CommitMessage.FileRenaming_OldNameNotCommitted', 'The file was not previously committed in the repository, although it did exist in the filesystem, so it appears as a new file in this commit.');
+			}
 		}
+
+		// Execute the operations
+		if ($operations['delete_old']) $this->repository()->removeFile($absolute_old_name);
+		if ($operations['create_new']) $this->repository()->addFile($absolute_new_name);
+		$commit_message = $base_commit_message;
+		if ($extra_commit_message) $commit_message .= PHP_EOL . $extra_commit_message;
 		$this->commit($commit_message);
 	}
 

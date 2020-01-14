@@ -76,7 +76,6 @@ I've also made [a pull request to bring my improvisations to the original librar
 ### For a 1.0 release:
 - Fix an issue with renamed/moved _folders_. See [issue #1](https://github.com/Taitava/silverstripe-assetcommitter/issues/1).
 - Handle file overwriting. I'm not sure how it goes right now, will it first perform a deletion commit and then a creation commit? See [issue #2](https://github.com/Taitava/silverstripe-assetcommitter/issues/2).
-- Do not try to commit ignored files. See [issue #3](https://github.com/Taitava/silverstripe-assetcommitter/issues/3).
 
 ### Can be done later:
 - Make it possible to use a subfolder of `assets` as the repository root directory. See [issue #4](https://github.com/Taitava/silverstripe-assetcommitter/issues/4).

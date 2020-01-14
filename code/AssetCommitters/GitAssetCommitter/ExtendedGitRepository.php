@@ -96,4 +96,36 @@ class ExtendedGitRepository extends GitRepository
 		return true;
 	}
 
+	/**
+	 * @param string $filename
+	 * @param bool $tracked_files_are_not_ignored If true (default), files that are already staged or committed, will not be considered as ignored even if they match any patterns in .gitignore files. This is git's normal behaviour. If set to false, doesn't check the git's index at all, only checks the .gitignore files (good for debugging .gitignore files).
+	 * @return bool
+	 * @throws GitException
+	 */
+	public function isFileIgnored($filename, $tracked_files_are_not_ignored = true)
+	{
+		$command = ['check-ignore', '-q', $filename];
+		if (!$tracked_files_are_not_ignored) $command[] = ' --no-index';
+		try
+		{
+			$this->execute($command);
+		}
+		catch (GitException $git_exception)
+		{
+			switch ($git_exception->getCode())
+			{
+			case 1:
+				// Not ignored
+				return false;
+			break;
+			default:
+				// An unrecognised error has occurred. Rethrow the exception.
+				throw $git_exception;
+			break;
+			}
+		}
+		// As the command didn't give any error code when exiting, it's a sign for us to know that the file _is_ ignored.
+		return true;
+	}
+
 }
